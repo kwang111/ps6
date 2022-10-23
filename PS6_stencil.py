@@ -74,6 +74,7 @@ def read_data():
 	return X, Y, testing_X, testing_Y
 
 # generate our 30 variables train_x and text_x
+# x is a dictionary of attributes
 def generate_variables(train_x, test_x):
 	new_train_x = []
 	new_test_x = []
@@ -86,6 +87,7 @@ def generate_variables(train_x, test_x):
 # Helper function to make new data x
 # x is a dictionary of attributes
 def make_new_x(x):
+	#TODO generate 30 features
 	new_x = []
 	new_x.append(x['loan_amount'])
 	new_x.append(x['funded_amount'])
@@ -150,8 +152,11 @@ def main():
 		mses_train.append(mse_train)
 		mses_test.append(mse_test)
 		lambdas.append(i)
+
+	betas = np.array(betas)
+	beta_norm = np.sum(np.abs(betas)**2,axis=-1)**(1./2)
 	
-	# make_graph(lambdas, betas, 'lambda values vs. beta values', 'lambda', 'beta')
+	make_graph(lambdas, beta_norm, 'lambda values vs. beta values', 'lambda', 'beta')
 	make_graph(lambdas, mses_train, 'lambda values vs. mse of training data', 'lambda', 'mse')
 	make_graph(lambdas, mses_test, 'lambda values vs. mse of testing data', 'lambda', 'mse')
 
