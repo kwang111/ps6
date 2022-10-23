@@ -84,14 +84,35 @@ def generate_variables(train_x, test_x):
 		new_test_x.append(make_new_x(row))
 	return new_train_x, new_test_x
 
+# gender dummy variable generator
+def gender_dummy(x):
+	if x =='M':
+		return 0
+	elif x == 'F':
+		return 1
+
 # Helper function to make new data x
 # x is a dictionary of attributes
 def make_new_x(x):
 	#TODO generate 30 features
 	new_x = []
-	new_x.append(x['loan_amount'])
+	# from description
+	new_x.append(len(x['description_texts_en']))
+	# factor variable
+	new_x.append(gender_dummy(x['borrowers_borrower_gender']))
+	# new_x.append(x['status'])
+	# new_x.append(x['activity'])
+	# new_x.append(x['sector'])
+	# new_x.append(x['location_country'])
+	# new_x.append(x['location_town']) # do we need this?
+
+	# continuous variable
 	new_x.append(x['funded_amount'])
+	new_x.append(x['paid_amount'])
 	new_x.append(x['terms_disbursal_amount'])
+	new_x.append(x['loan_amount'])
+	new_x.append(x['repayment_term'])
+	
 	return new_x
 
 # TODO: compute accuracy of your estimates
