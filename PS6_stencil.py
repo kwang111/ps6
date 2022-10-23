@@ -91,6 +91,7 @@ def make_new_x(x):
 	new_x = []
 	new_x.append(x['loan_amount'])
 	new_x.append(x['funded_amount'])
+	new_x.append(x['terms_disbursal_amount'])
 	return new_x
 
 # TODO: compute accuracy of your estimates
@@ -107,6 +108,18 @@ def calculate_mse(data, label, beta):
 
 def make_graph(x, y, title, x_lab, y_lab):
 	plt.plot(x, y)
+	plt.title(title)
+	plt.xlabel(x_lab)
+	plt.ylabel(y_lab)
+	plt.show()
+
+def make_beta_graph(x, y, title, x_lab, y_lab):
+	print(y.shape)
+	n, m = y.shape
+	for i in range(m):
+		bi = y[:,i]
+		print(bi.shape)
+		plt.plot(x, bi, label = "line " + str(i))
 	plt.title(title)
 	plt.xlabel(x_lab)
 	plt.ylabel(y_lab)
@@ -152,11 +165,8 @@ def main():
 		mses_train.append(mse_train)
 		mses_test.append(mse_test)
 		lambdas.append(i)
-
-	betas = np.array(betas)
-	beta_norm = np.sum(np.abs(betas)**2,axis=-1)**(1./2)
 	
-	make_graph(lambdas, beta_norm, 'lambda values vs. beta values', 'lambda', 'beta')
+	make_beta_graph(lambdas, np.squeeze(np.array(betas)), 'lambda values vs. beta values', 'lambda', 'beta')
 	make_graph(lambdas, mses_train, 'lambda values vs. mse of training data', 'lambda', 'mse')
 	make_graph(lambdas, mses_test, 'lambda values vs. mse of testing data', 'lambda', 'mse')
 
