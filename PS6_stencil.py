@@ -129,7 +129,6 @@ def make_new_x(x):
 	# from description
 	new_x.append(len(x['description_texts_en']))
 	positive_word_count, negative_word_count, supportive_background_word_count, unsupportive_background_word_count = word_count(x['description_texts_en'])
-	#print(positive_word_count, negative_word_count, supportive_background_word_count, unsupportive_background_word_count)
 	new_x.append(positive_word_count)
 	new_x.append(negative_word_count)
 	new_x.append(supportive_background_word_count)
@@ -139,15 +138,27 @@ def make_new_x(x):
 	new_x.append(x['borrowers_borrower_gender'] =='F')
 	new_x.append(x['status'] == 'NA')
 	new_x.append(x['status'] == 'paid')
+	new_x.append(x['status'] == 'defaulted')
 	new_x.append(x['activity'] == 'Farming')
 	new_x.append(x['activity'] == 'Food')
 	new_x.append(x['activity'] == 'Retail')
+	new_x.append(x['activity'] == 'Electrical Goods' or x['activity'] == 'Movie Tapes & DVDs' or x['activity'] == 'Music Discs & Tapes' or x['activity'] =='Phone Accessories' or x['activity'] =='Computers'
+				 or x['activity'] == 'Mobile Phones' or x['activity'] == 'Internet Cafe' or x['activity'] == 'Electronics Repair')
+	new_x.append(x['activity'] == 'Animal Sales' or x['activity'] == 'Bicycle Sales' or x['activity'] == 'Charcoal Sales' or x['activity'] == 'Clothing Sales'
+				 or x['activity'] == 'Cosmetics Sales' or x['activity'] == 'Decorations Sales' or x['activity'] == 'Electronics Sales' 
+				 or x['activity'] == 'Food Production/Sales' or x['activity'] == 'Home Products Sales' or x['activity'] == 'Milk Sales' or x['activity'] == 'Paper Sales'
+				 or x['activity'] == 'Personal Products Sales' or x['activity'] == 'Phone Use Sales' or x['activity'] == 'Plastics Sales' or x['activity'] == 'Shoe Sales'
+				 or x['activity'] == 'Souvenir Sales' or x['activity'] == 'Sporting Good Sales' or x['activity'] == 'Timber Sales' or x['activity'] == 'Traveling Sales' or x['activity'] == 'Veterinary Sales')
+	new_x.append(x['activity'] == 'Personal Medical Expenses' or x['activity'] == 'Wedding Expenses' or x['activity'] == 'Funeral Expenses' or x['activity'] == 'Personal Housing Expenses'
+				 or x['activity'] == 'Higher education costs' or x['activity'] == 'Primary/secondary school costs')
 	new_x.append(x['sector'] == 'Agriculture')
 	new_x.append(x['sector'] == 'Food')
 	new_x.append(x['sector'] == 'Retail')
 	new_x.append(country_to_continent(x['location_country']) == 'AF')
 	new_x.append(country_to_continent(x['location_country']) == 'AS')
-	new_x.append(country_to_continent(x['location_country']) == 'NA' or country_to_continent(x['location_country']) == 'SA')
+	new_x.append(country_to_continent(x['location_country']) == 'NA')
+	new_x.append(country_to_continent(x['location_country']) == 'SA')
+	new_x.append(country_to_continent(x['location_country']) == 'EU' or country_to_continent(x['location_country']) == 'OC')
 
 	# continuous variable
 	new_x.append(x['terms_disbursal_amount'])
