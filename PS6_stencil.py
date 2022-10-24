@@ -159,6 +159,13 @@ def make_new_x(x):
 	new_x.append(country_to_continent(x['location_country']) == 'NA')
 	new_x.append(country_to_continent(x['location_country']) == 'SA')
 	new_x.append(country_to_continent(x['location_country']) == 'EU' or country_to_continent(x['location_country']) == 'OC')
+	# Top 5 frequently appearing counrties get their own variable!! 
+	new_x.append(x['location_country'] == 'Philippines') #3605
+	new_x.append(x['location_country'] == 'Kenya') #2254
+	new_x.append(x['location_country'] == 'Peru') #1594
+	new_x.append(x['location_country'] == 'Uganda') #827
+	new_x.append(x['location_country'] == 'Cambodia') #770
+
 
 	# continuous variable
 	new_x.append(x['terms_disbursal_amount'])
@@ -188,14 +195,11 @@ def make_graph(x, y, title, x_lab, y_lab):
 
 def make_beta_graph(x, y, title, x_lab, y_lab):
 	n, m = y.shape
-	print(m)
 	for i in range(m):
 		bi = y[:,i]
-		print(bi)
 		label = "beta" + str(i)
-		print(label)
 		plt.plot(x, bi, label = label)
-	plt.legend(loc='upper center')
+	plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 	plt.title(title)
 	plt.xlabel(x_lab)
 	plt.ylabel(y_lab)
@@ -229,8 +233,8 @@ def main():
 	mses_test = []
 	lambdas = []
 
-	for i in range(10):
-		if i % 10 == 0:
+	for i in range(1000):
+		if i % 50 == 0:
 			print("calculating " + str(i) + " as lambda")
 		beta = ridge(train_x_demeaned, train_y_demeaned, i)
 		mse_train = calculate_mse(train_x_demeaned, train_y_demeaned, beta).tolist()[0][0]
