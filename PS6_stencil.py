@@ -2,10 +2,12 @@ import csv
 from math import log
 from collections import defaultdict, Counter
 import random
-from re import A
+from re import A, X
 import numpy as np
 import string
 import matplotlib.pyplot as plt
+import pycountry_convert as pc
+
 
 # set random seed so that random draws are the same each time
 random.seed(12409)
@@ -55,7 +57,7 @@ def read_data():
 				dictionary.update({header[heading]:float(row[heading])})
 			elif header[heading] in integers:
 				dictionary.update({header[heading]:int(row[heading])})
-			elif header[heading] == 'description':
+			elif header[heading] == 'description_texts_en':
 				st = ''.join(ch for ch in row[heading] if ch not in exclude).lower()
 				dictionary.update({header[heading]:set(st.split())})
 			else:
@@ -84,35 +86,76 @@ def generate_variables(train_x, test_x):
 		new_test_x.append(make_new_x(row))
 	return new_train_x, new_test_x
 
-# gender dummy variable generator
-def gender_dummy(x):
-	if x =='M':
-		return 0
-	elif x == 'F':
-		return 1
+# helper function to convert country into continents
+def country_to_continent(country_name):
+	country_continent_code = ''
+	if(country_name == 'Congo (Dem. Rep.)' or country_name == 'Congo (Rep.)' or country_name == 'The Democratic Republic of the Congo'):
+		country_continent_code == 'AF'
+	elif (country_name == 'Myanmar (Burma)' or country_name == 'Cote D\'Ivoire' or country_name == 'Lao PDR' or country_name == 'Timor-Leste'):
+		country_continent_code == 'AS'
+	elif (country_name == 'Kosovo'):
+		country_continent_code == 'EU'
+	else:
+		country_alpha2 = pc.country_name_to_country_alpha2(country_name)
+		country_continent_code = pc.country_alpha2_to_continent_code(country_alpha2)
+	
+	return country_continent_code
+
+# helper function to create description dummies for word presence
+def word_count(x):
+	positive_words = set(['good','support', 'expertise', 'happy','responsible', 'trustful', 'honor', 'polite', 'leader', 'president', 'represent', 'nice', 'budget', 'active',
+									'grow', 'improve', 'improving', 'great', 'help', 'motivate', 'first', 'grow', 'enjoy', 'photo', 'skill', 'dream', 'new', 'bless' ])
+	negative_words = set(['quit','unreliable', 'four','five', 'six','seven','eight', 'hard', 'without', 'maybe', 'unstable', 'party', 
+									'already', 'previous', 'supplement', 'another', 'additional', 'enough', 'increase', 'increasing', 'neither', 'nor',
+									'little', 'continue', 'far', 'but', 'struggle', 'risk', 'lack'])
+	supportive_personal_background = set(['married', 'husband', 'wife', 'children', 'help', 'house', 'town', 'job', 'income'])
+	unsupportive_personal_background = set(['children', 'single mother', 'single', 'divorce', 'widow', 'rural', 'village', 'volatile', 'challenge', 'unemploy', 'young'])
+	
+	positive_word_presence = {i for i in x if any(j in i for j in positive_words)}
+	positive_word_count = len(positive_word_presence)
+	negative_word_presence = {i for i in x if any(j in i for j in negative_words)}
+	negative_word_count = len(negative_word_presence)
+	supportive_background_word_presence = {i for i in x if any(j in i for j in supportive_personal_background)}
+	supportive_background_word_count = len(supportive_background_word_presence)
+	unsupportive_background_word_presence = {i for i in x if any(j in i for j in unsupportive_personal_background)}
+	unsupportive_background_word_count = len(unsupportive_background_word_presence)
+
+	return positive_word_count, negative_word_count, supportive_background_word_count, unsupportive_background_word_count
 
 # Helper function to make new data x
 # x is a dictionary of attributes
 def make_new_x(x):
-	#TODO generate 30 features
 	new_x = []
 	# from description
 	new_x.append(len(x['description_texts_en']))
+	positive_word_count, negative_word_count, supportive_background_word_count, unsupportive_background_word_count = word_count(x['description_texts_en'])
+	#print(positive_word_count, negative_word_count, supportive_background_word_count, unsupportive_background_word_count)
+	new_x.append(positive_word_count)
+	new_x.append(negative_word_count)
+	new_x.append(supportive_background_word_count)
+	new_x.append(unsupportive_background_word_count)
+
 	# factor variable
-	new_x.append(gender_dummy(x['borrowers_borrower_gender']))
-	# new_x.append(x['status'])
-	# new_x.append(x['activity'])
-	# new_x.append(x['sector'])
-	# new_x.append(x['location_country'])
-	# new_x.append(x['location_town']) # do we need this?
+	new_x.append(x['borrowers_borrower_gender'] =='F')
+	new_x.append(x['status'] == 'NA')
+	new_x.append(x['status'] == 'paid')
+	new_x.append(x['activity'] == 'Farming')
+	new_x.append(x['activity'] == 'Food')
+	new_x.append(x['activity'] == 'Retail')
+	new_x.append(x['sector'] == 'Agriculture')
+	new_x.append(x['sector'] == 'Food')
+	new_x.append(x['sector'] == 'Retail')
+	new_x.append(country_to_continent(x['location_country']) == 'AF')
+	new_x.append(country_to_continent(x['location_country']) == 'AS')
+	new_x.append(country_to_continent(x['location_country']) == 'NA' or country_to_continent(x['location_country']) == 'SA')
 
 	# continuous variable
-	new_x.append(x['funded_amount'])
 	new_x.append(x['paid_amount'])
 	new_x.append(x['terms_disbursal_amount'])
-	new_x.append(x['loan_amount'])
 	new_x.append(x['repayment_term'])
 	
+
+
 	return new_x
 
 # TODO: compute accuracy of your estimates
@@ -178,7 +221,7 @@ def main():
 	mses_test = []
 	lambdas = []
 
-	for i in range(10):
+	for i in range(50):
 		beta = ridge(train_x_demeaned, train_y_demeaned, i)
 		mse_train = calculate_mse(train_x_demeaned, train_y_demeaned, beta).tolist()[0][0]
 		mse_test = calculate_mse(test_x_demeaned, test_y_demeaned, beta).tolist()[0][0]
