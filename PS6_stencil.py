@@ -150,21 +150,10 @@ def make_new_x(x):
 	new_x.append(country_to_continent(x['location_country']) == 'NA' or country_to_continent(x['location_country']) == 'SA')
 
 	# continuous variable
-<<<<<<< HEAD
-	new_x.append(x['paid_amount'])
-	new_x.append(x['terms_disbursal_amount'])
-=======
-	# use one or two continuous variables here because they are very correlated and similar colinearity
-	new_x.append(x['funded_amount'])
-	new_x.append(x['paid_amount'])
 	new_x.append(x['terms_disbursal_amount'])
 	new_x.append(x['loan_amount'])
-
->>>>>>> 160a8b6e19f72cfd116f042ea61f4d2666aca955
 	new_x.append(x['repayment_term'])
 	
-
-
 	return new_x
 
 # TODO: compute accuracy of your estimates
@@ -229,13 +218,9 @@ def main():
 	mses_test = []
 	lambdas = []
 
-<<<<<<< HEAD
-	for i in range(50):
-=======
 	for i in range(10):
 		if i % 10 == 0:
 			print("calculating " + str(i) + " as lambda")
->>>>>>> 160a8b6e19f72cfd116f042ea61f4d2666aca955
 		beta = ridge(train_x_demeaned, train_y_demeaned, i)
 		mse_train = calculate_mse(train_x_demeaned, train_y_demeaned, beta).tolist()[0][0]
 		mse_test = calculate_mse(test_x_demeaned, test_y_demeaned, beta).tolist()[0][0]
