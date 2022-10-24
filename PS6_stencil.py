@@ -107,10 +107,12 @@ def make_new_x(x):
 	# new_x.append(x['location_town']) # do we need this?
 
 	# continuous variable
+	# use one or two continuous variables here because they are very correlated and similar colinearity
 	new_x.append(x['funded_amount'])
 	new_x.append(x['paid_amount'])
 	new_x.append(x['terms_disbursal_amount'])
 	new_x.append(x['loan_amount'])
+
 	new_x.append(x['repayment_term'])
 	
 	return new_x
@@ -135,12 +137,15 @@ def make_graph(x, y, title, x_lab, y_lab):
 	plt.show()
 
 def make_beta_graph(x, y, title, x_lab, y_lab):
-	print(y.shape)
 	n, m = y.shape
+	print(m)
 	for i in range(m):
 		bi = y[:,i]
-		print(bi.shape)
-		plt.plot(x, bi, label = "line " + str(i))
+		print(bi)
+		label = "beta" + str(i)
+		print(label)
+		plt.plot(x, bi, label = label)
+	plt.legend(loc='upper center')
 	plt.title(title)
 	plt.xlabel(x_lab)
 	plt.ylabel(y_lab)
@@ -148,10 +153,6 @@ def make_beta_graph(x, y, title, x_lab, y_lab):
 
 def main():
 	train_x, train_y, test_x, test_y = read_data()
-	print(train_x[5])
-	print(train_y[5])
-	print(test_x[100])
-	print(test_y[100])
 	train_x, test_x = generate_variables(train_x, test_x)
 	train_x  = np.matrix(train_x)
 	train_y  = np.array(train_y)
@@ -179,6 +180,8 @@ def main():
 	lambdas = []
 
 	for i in range(10):
+		if i % 10 == 0:
+			print("calculating " + str(i) + " as lambda")
 		beta = ridge(train_x_demeaned, train_y_demeaned, i)
 		mse_train = calculate_mse(train_x_demeaned, train_y_demeaned, beta).tolist()[0][0]
 		mse_test = calculate_mse(test_x_demeaned, test_y_demeaned, beta).tolist()[0][0]
@@ -186,7 +189,6 @@ def main():
 		mses_train.append(mse_train)
 		mses_test.append(mse_test)
 		lambdas.append(i)
-	
 	make_beta_graph(lambdas, np.squeeze(np.array(betas)), 'lambda values vs. beta values', 'lambda', 'beta')
 	make_graph(lambdas, mses_train, 'lambda values vs. mse of training data', 'lambda', 'mse')
 	make_graph(lambdas, mses_test, 'lambda values vs. mse of testing data', 'lambda', 'mse')
