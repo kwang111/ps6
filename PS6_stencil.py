@@ -237,6 +237,8 @@ def main():
 		if i % 50 == 0:
 			print("calculating " + str(i) + " as lambda")
 		beta = ridge(train_x_demeaned, train_y_demeaned, i)
+		if i/10 == 1:
+			print(beta)
 		mse_train = calculate_mse(train_x_demeaned, train_y_demeaned, beta).tolist()[0][0]
 		mse_test = calculate_mse(test_x_demeaned, test_y_demeaned, beta).tolist()[0][0]
 		betas.append(beta)
